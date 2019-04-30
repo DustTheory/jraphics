@@ -42,7 +42,7 @@ struct Map{
 
     uint8_t at_coord(Point p){
         p = to_coord(p);
-        return map[int(p.y)*W+int(p.x)];
+        return map[int(floor(p.y))*W+int(floor(p.x))];
     }
 
     bool out_of_bounds(Point p){
@@ -57,7 +57,8 @@ struct Map{
     Point get_spawnpoint(){
         for(int i = 0; i < W*H; i++)
             if(map[i] == spawnpoint){
-                return to_coord({(float)(spawnpoint % 3), (float)(spawnpoint / 3)});
+                printf("%d\n", i);
+                return to_coord({(float)((spawnpoint+1)/3), (float)((spawnpoint+1) % 3)});
             }
         return {0.0, 0.0}; 
     }

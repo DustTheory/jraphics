@@ -16,7 +16,7 @@ sf::Uint8 *pixels;
 sf::Texture *display_texture;
 sf::Sprite *display_sprite;
 
-int W_WIDTH = 200, W_HEIGHT = 200;
+int W_WIDTH = 500, W_HEIGHT = 500;
 
 struct ray_collision{
     float dist;
@@ -40,100 +40,88 @@ const float deg360 = 2*M_PI;
 
 #define EPS 1e-9
 
+
 ray_collision cast_ray(float x, float y, float r){
-    if(abs(r) <= EPS || abs(r-deg180) < EPS){
-        int a = floor(x), b = floor(y);
-        int dir = r < 1 ? 1 : -1;
-        while(true){
-            a+=dir;
-            if(gamemap.out_of_bounds({(float)a, (float)b}))
-                return {player.dist({(float)(a-dir), (float)b}), gamemap.at_coord({(float)(a-dir), (float)b})};
-            if(gamemap.at_coord({(float)a, (float)b}) != empty)
-                return {player.dist({(float)a, (float)b}), gamemap.at_coord({(float)a, (float)b})};
-        }
-    }
-    if(abs(r-deg90) <= EPS || abs(r-deg270) < EPS){
-        int a = floor(x), b = floor(y);
-        int dir = abs(r-deg90) <= EPS ? 1 : -1;
-        while(true){
-            b+=dir;
-            if(gamemap.out_of_bounds({(float)a, (float)b}))
-                return {player.dist({(float)(a), (float)(b-dir)}), gamemap.at_coord({(float)(a), (float)(b-dir)})};
-            if(gamemap.at_coord({(float)a, (float)b}) != empty)
-                return {player.dist({(float)a, (float)b}), gamemap.at_coord({(float)a, (float)b})};
-        }
-    }
-    int k = atan(r); // slope of the ray
-    int n = y - k*x; // y = k*x + n
-    int dir_a, dir_b;
-    if(r < deg90 || r > deg270)
-        dir_a = 1;
-    else 
-        dir_a = -1;
-    if(r < deg180)
-        dir_b = 1;
-    else
-        dir_a = -1;
-    int a = floor(x+dir_a), b = floor(y+dir_b);
-    float tmp;
+    if(abs(r) <= EPS || abs(r-deg180) < EPS || abs(r-deg90) <= EPS || abs(r-deg270) < EPS)
+        r += 0.016;
+    
+    float a = x, b;
+    float step = 0.1 * ((r < deg90 || r > deg270) ? 1 : -1);
+    float k = atan(r), n = y - k*x;
     while(true){
-        tmp = abs((a*k + n) - y);
-        if(floor(tmp+EPS) == b){
-            a+=dir_a;
-            if(gamemap.out_of_bounds({(float)a, (float)b}))
-                return {player.dist({(float)(a-dir_a), (float)b}), gamemap.at_coord({(float)(a-dir_a), (float)b})};
-            if(gamemap.at_coord({(float)a, (float)b}) != empty)
-                return {player.dist({(float)a, (float)b}), gamemap.at_coord({(float)a, (float)b})};
-            
-        }else{
-            b+=dir_b;
-            if(gamemap.out_of_bounds({(float)a, (float)b}))
-                return {player.dist({(float)a, (float)(b-dir_b)}), gamemap.at_coord({(float)a, (float)(b-dir_b)})};
-            if(gamemap.at_coord({(float)a, (float)b}) != empty)
-                return {player.dist({(float)a, (float)b}), gamemap.at_coord({(float)a, (float)b})};
+        b = a*x+n;
+        if(gamemap.out_of_bounds({a, b})){
+            a-=step;
+            b = a*x+n;
+            return {player.dist({a, b}), gamemap.at_coord({a, b})};
         }
+        if(gamemap.at_coord({a, b}) != empty)
+            return {player.dist({a, b}), gamemap.at_coord({a, b})};
+        a += step;
     }
 }
 
+void set_pixel(int a, int b, sf::Color c){
+    pixels[(a*W_WIDTH+b)*4] = c.r;
+    pixels[(a*W_WIDTH+b)*4+1] = c.g;
+    pixels[(a*W_WIDTH+b)*4+2] = c.b;
+    pixels[(a*W_WIDTH+b)*4+3] = c.a;
+}
+
 void drawline(int col, float h, uint8_t o){
-    int screenarea = (W_HEIGHT-1)*(W_WIDTH-1);
-    int h1 = (W_HEIGHT-h)/2;
+    sf::Color c;
+    if(o == 1)
+        c = sf::Color::Blue;
+    else if(o == 2)
+        c = sf::Color::Red;
+    else if(o == 3)
+        c = sf::Color::Green;
+    int h1 = (W_HEIGHT-(int)h)/2;
     for(int i = 0; i < h1; i++){
-        pixels[(i*W_WIDTH+col)*4] = 0;
-        pixels[(i*W_WIDTH+col)*4+1] = 0;
-        pixels[(i*W_WIDTH+col)*4+2] = 0;
-        pixels[(i*W_WIDTH+col)*4+3] = 255;
+        set_pixel(i, col, sf::Color::White);
     }
     int h2 = h1 + h;
     for(int i = h1; i < h2; i++){
-        pixels[(i*W_WIDTH+col)*4] = 0;
-        pixels[(i*W_WIDTH+col)*4+1] = 0;
-        pixels[(i*W_WIDTH+col)*4+2] = 0;
-        pixels[(i*W_WIDTH+col)*4+3] = 255;
+        set_pixel(i, col, c);
     }
 
     int h3 = W_HEIGHT;
-    for(int i = h2; i < h2; i++){
-        pixels[(i*W_WIDTH+col)*4] = 0;
-        pixels[(i*W_WIDTH+col)*4+1] = 0;
-        pixels[(i*W_WIDTH+col)*4+2] = 0;
-        pixels[(i*W_WIDTH+col)*4+3] = 255;
+    for(int i = h2; i < h3; i++){
+        set_pixel(i, col, sf::Color::Yellow);
     }
 
 }
 
 uint8_t max(uint8_t a, uint8_t b){
-    return a < b;
+    return a > b ? a : b;
+}
+
+float deg_to_rad(float deg){
+    return deg*M_PI/180;
+}
+
+float rad_to_deg(float rad){
+    return rad*180/M_PI;
 }
 
 void render_frame(){
-
-    float depth_ratio = W_HEIGHT/(float)max(gamemap.W, gamemap.H);
+    float depth_ratio = (float)W_HEIGHT/(float)max(gamemap.W, gamemap.H);
+    float FOV = deg_to_rad(10); // 120 degree FOV
+    float angle = player.r + FOV/2;
+    while(angle > deg360)
+        angle -= deg360;
+    float step = FOV/(float)W_WIDTH;
     for(int i = 0; i < W_WIDTH; i++){
-        ray_collision colision = cast_ray(player.pos.x, player.pos.y, player.r);
+        ray_collision colision = cast_ray(player.pos.x, player.pos.y, angle);
         drawline(i, colision.dist*depth_ratio, colision.object);  
+        angle -= step;
+       // if(angle < 0){
+       //     angle += deg360;
+       // }
     }
-
+   // printf("\n");
+    display_texture->update(pixels);
+    window->draw(*display_sprite);
 }
 
 
@@ -146,6 +134,8 @@ void create_window(){
 }
 
 
+
+
 int main(int argc, char* argv[]){
     printf("########## WELCOME! ##########\nraycasting fps game by ieexmml\n\n");
 
@@ -155,25 +145,29 @@ int main(int argc, char* argv[]){
     getline(std::cin, filename);
     gamemap.load_map(filename.c_str());
     Point spawnpoint = gamemap.get_spawnpoint();
-    player = {spawnpoint.x, spawnpoint.y, 0.0};
+    printf("SPAWN: %f %f\n", spawnpoint.x, spawnpoint.y);
+    player = {spawnpoint.x, spawnpoint.y, 0};
     create_window();
-    while(true){
-        render_frame();    
+
+    window->setVerticalSyncEnabled(true);
+    window->setFramerateLimit(60);
+    int framecount = 0;
+    while (window->isOpen())
+    {
+        sf::Event event;
+        while (window->pollEvent(event))
+        {
+            if (event.type == sf::Event::Closed)
+                window->close();
+        }
+        window->clear(sf::Color::Black);
+        render_frame();
+        framecount++;
+        if(framecount == 30){
+            framecount = 0;
+            player.r+=0.3;
+            printf("%f\n", rad_to_deg(player.r));
+        }
+        window->display();
     }
-     window->setVerticalSyncEnabled(true);
-     window->setFramerateLimit(60);
-     while (window->isOpen())
-     {
-         sf::Event event;
-         while (window->pollEvent(event))
-         {
-             if (event.type == sf::Event::Closed)
-                 window->close();
-         }
-         window->clear(sf::Color::Black);
-         render_frame();
-         display_texture->update(pixels);
-         window->draw(*display_sprite);
-         window->display();
-     }
 }
