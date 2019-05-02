@@ -40,33 +40,31 @@ struct Map{
         free(line);
     }
 
-    uint8_t at_coord(Point p){
-        p = to_coord(p);
-        return map[int(floor(p.y))*W+int(floor(p.x))];
+    uint8_t at_coord(Point p, bool convert = true){
+        int a = floor(p.x);
+        int b = floor((float)H-p.y);
+        int i = W*b + a;
+        return map[i];
     }
 
     bool out_of_bounds(Point p){
-        return p.x < 0 || p.x > W || p.y < 0 || p.y > H;
+        return ceil(p.x) < 0 || ceil(p.x) >= W || ceil(p.y) < 0 || ceil(p.y) >= H;
     }
 
     Point to_coord(Point p){
-        p.y = (float)H - p.y;
+        p.y = (float)H-1 - p.y;
         return p;
     }
 
     Point get_spawnpoint(){
         for(int i = 0; i < W*H; i++)
             if(map[i] == spawnpoint){
-                printf("%d\n", i);
-                return to_coord({(float)((spawnpoint+1)/3), (float)((spawnpoint+1) % 3)});
+                float x = (i+1) % W;
+                float y = (i+1) / W;
+                return to_coord({x , y});
             }
         return {0.0, 0.0}; 
     }
 };
 
 typedef struct Map Map;
-
-
-void print_map(Map *map){
- 
-}

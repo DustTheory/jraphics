@@ -16,7 +16,27 @@ sf::Uint8 *pixels;
 sf::Texture *display_texture;
 sf::Sprite *display_sprite;
 
+sf::RectangleShape *minimap;
+sf::Uint8 *minimap_pixels;
+sf::Texture *minimap_texture;
+sf::Sprite *minimap_sprite;
+
+
 int W_WIDTH = 500, W_HEIGHT = 500;
+
+void create_window(){    
+    window = new sf::RenderWindow(sf::VideoMode(800, 600), "raycasting_fps");
+   
+    pixels = new sf::Uint8[W_WIDTH*W_HEIGHT*4];
+    display_texture = new sf::Texture;
+    display_texture->create(W_WIDTH, W_HEIGHT);
+    display_sprite = new sf::Sprite(*display_texture);
+
+    minimap_pixels = new sf::Uint8[gamemap.W*gamemap.H*4];
+    minimap_texture = new sf::Texture;
+    minimap_texture->create(gamemap.W, gamemap.H);
+    minimap_sprite = new sf::Sprite(*minimap_texture);
+}
 
 struct ray_collision{
     float dist;
@@ -40,27 +60,6 @@ const float deg360 = 2*M_PI;
 
 #define EPS 1e-9
 
-
-ray_collision cast_ray(float x, float y, float r){
-    if(abs(r) <= EPS || abs(r-deg180) < EPS || abs(r-deg90) <= EPS || abs(r-deg270) < EPS)
-        r += 0.016;
-    
-    float a = x, b;
-    float step = 0.1 * ((r < deg90 || r > deg270) ? 1 : -1);
-    float k = atan(r), n = y - k*x;
-    while(true){
-        b = a*x+n;
-        if(gamemap.out_of_bounds({a, b})){
-            a-=step;
-            b = a*x+n;
-            return {player.dist({a, b}), gamemap.at_coord({a, b})};
-        }
-        if(gamemap.at_coord({a, b}) != empty)
-            return {player.dist({a, b}), gamemap.at_coord({a, b})};
-        a += step;
-    }
-}
-
 void set_pixel(int a, int b, sf::Color c){
     pixels[(a*W_WIDTH+b)*4] = c.r;
     pixels[(a*W_WIDTH+b)*4+1] = c.g;
@@ -68,26 +67,26 @@ void set_pixel(int a, int b, sf::Color c){
     pixels[(a*W_WIDTH+b)*4+3] = c.a;
 }
 
+
+ray_collision cast_ray(float x, float y, float r){
+        
+}
+
+
 void drawline(int col, float h, uint8_t o){
-    sf::Color c;
-    if(o == 1)
-        c = sf::Color::Blue;
-    else if(o == 2)
-        c = sf::Color::Red;
-    else if(o == 3)
-        c = sf::Color::Green;
+
     int h1 = (W_HEIGHT-(int)h)/2;
     for(int i = 0; i < h1; i++){
-        set_pixel(i, col, sf::Color::White);
+        set_pixel(i, col, sf::Color(255, 255, 255, 50));
     }
     int h2 = h1 + h;
     for(int i = h1; i < h2; i++){
-        set_pixel(i, col, c);
+        set_pixel(i, col, sf::Color(255,0, 0, 50));
     }
 
     int h3 = W_HEIGHT;
     for(int i = h2; i < h3; i++){
-        set_pixel(i, col, sf::Color::Yellow);
+        set_pixel(i, col, sf::Color(255, 255, 0, 50));
     }
 
 }
@@ -105,40 +104,70 @@ float rad_to_deg(float rad){
 }
 
 void render_frame(){
-    float depth_ratio = (float)W_HEIGHT/(float)max(gamemap.W, gamemap.H);
-    float FOV = deg_to_rad(10); // 120 degree FOV
+
+    int gamemap_area = gamemap.W*gamemap.H*4;
+    int a, b;
+    uint8_t o;
+    for(int i = 0; i < gamemap_area; i+=4){
+        o = gamemap.map[i/4];
+        if(o == empty){
+            minimap_pixels[i] = 255;
+            minimap_pixels[i+1] = 255;
+            minimap_pixels[i+2] = 255;
+            minimap_pixels[i+3] = 50;
+        }else if(o == wall){
+            minimap_pixels[i] = 70;
+            minimap_pixels[i+1] = 70;
+            minimap_pixels[i+2] = 70;
+            minimap_pixels[i+3] = 50;
+        }else{
+            minimap_pixels[i] = 255;
+            minimap_pixels[i+1] = 0;
+            minimap_pixels[i+2] = 0;
+            minimap_pixels[i+3] = 50;
+        }
+    }
+
+
+    float scale_y = (float)W_HEIGHT/3.0/(float)gamemap.H;
+    float scale_x = (float)gamemap.W/(float)gamemap.H*scale_y;
+
+    float depth_ratio = (float)W_HEIGHT/(gamemap.H+gamemap.W);
+    float FOV = deg_to_rad(120); // 120 degree FOV
     float angle = player.r + FOV/2;
     while(angle > deg360)
         angle -= deg360;
     float step = FOV/(float)W_WIDTH;
-    for(int i = 0; i < W_WIDTH; i++){
+    for(int i =  W_WIDTH-1; i >=0; i--){
         ray_collision colision = cast_ray(player.pos.x, player.pos.y, angle);
         drawline(i, colision.dist*depth_ratio, colision.object);  
         angle -= step;
-       // if(angle < 0){
-       //     angle += deg360;
-       // }
     }
-   // printf("\n");
+
+    minimap_texture->update(minimap_pixels);
+    minimap_sprite->setScale(scale_x, scale_y);
+    minimap_sprite->setPosition(scale_x*0.5, scale_y*0.5);
+
     display_texture->update(pixels);
     window->draw(*display_sprite);
+    window->draw(*minimap_sprite);
+
+    angle = player.r + FOV/2;
+    while(angle > deg360)
+        angle -= deg360;
+
+    for(int i = 0; i < W_WIDTH; i++){
+        sf::RectangleShape line(sf::Vector2f(150.f, 1.f));
+        line.setPosition((player.pos.x)*scale_x, scale_y*(gamemap.H-player.pos.y));
+        line.rotate(rad_to_deg(-angle));
+        line.setFillColor(sf::Color(0, 0, 0, 10));
+        window->draw(line);
+        angle -= step;
+    }
 }
-
-
-void create_window(){
-    window = new sf::RenderWindow(sf::VideoMode(800, 600), "raycasting_fps");
-    pixels = new sf::Uint8[W_WIDTH*W_HEIGHT*4];
-    display_texture = new sf::Texture;
-    display_texture->create(W_WIDTH, W_HEIGHT);
-    display_sprite = new sf::Sprite(*display_texture);
-}
-
-
-
 
 int main(int argc, char* argv[]){
     printf("########## WELCOME! ##########\nraycasting fps game by ieexmml\n\n");
-
 
     printf("Enter map file relative path: \n");
     std::string filename;
@@ -146,7 +175,7 @@ int main(int argc, char* argv[]){
     gamemap.load_map(filename.c_str());
     Point spawnpoint = gamemap.get_spawnpoint();
     printf("SPAWN: %f %f\n", spawnpoint.x, spawnpoint.y);
-    player = {spawnpoint.x, spawnpoint.y, 0};
+    player = {spawnpoint.x, spawnpoint.y, deg270};
     create_window();
 
     window->setVerticalSyncEnabled(true);
@@ -163,10 +192,9 @@ int main(int argc, char* argv[]){
         window->clear(sf::Color::Black);
         render_frame();
         framecount++;
-        if(framecount == 30){
+        if(framecount == 60){
             framecount = 0;
             player.r+=0.3;
-            printf("%f\n", rad_to_deg(player.r));
         }
         window->display();
     }

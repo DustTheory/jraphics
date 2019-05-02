@@ -5,6 +5,7 @@
 #include <cstring>
 #include <ncurses.h>
 #include <string>
+#include <math.h>
 #include "gamemap.h"
 #include <iostream>
 
