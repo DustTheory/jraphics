@@ -12,9 +12,10 @@ struct Point{
 
 struct Map{
     int W, H;
+    int area;
     uint8_t *map;
     Map(){}
-    Map(int W, int H) : W(W), H(H){
+    Map(int W, int H) : W(W), H(H), area(H*W){
         map = (uint8_t*)malloc(W*H*sizeof(uint8_t));
         memset(map, empty, W*H);
     }
@@ -42,7 +43,7 @@ struct Map{
 
     uint8_t at_coord(Point p, bool convert = true){
         int a = floor(p.x);
-        int b = floor((float)H-p.y);
+        int b = floor(p.y);
         int i = W*b + a;
         return map[i];
     }
@@ -56,6 +57,7 @@ struct Map{
         return p;
     }
 
+
     Point get_spawnpoint(){
         for(int i = 0; i < W*H; i++)
             if(map[i] == spawnpoint){
@@ -66,5 +68,3 @@ struct Map{
         return {0.0, 0.0}; 
     }
 };
-
-typedef struct Map Map;
