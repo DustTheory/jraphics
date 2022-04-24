@@ -1,4 +1,5 @@
-GL_LOG_FILE log. local time Fri Oct 22 22:41:58 2021
+GL_LOG_FILE log. local time Thu Apr 21 16:25:49 2022
 
 starting GLFW
 3.2.1 X11 GLX EGL clock_gettime /dev/js Xf86vm shared
+Successfully loaded texture ./assets/bricks.jpg

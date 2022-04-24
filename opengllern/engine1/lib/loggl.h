@@ -1,9 +1,9 @@
-
+#include <GLFW/glfw3.h>
 
 #ifndef ENGINE1_LIB_LOGGL_H_
 #define ENGINE1_LIB_LOGGL_H_
 
-#define GL_LOG_FILE "logs/gl.log"
+#define GL_LOG_FILE "gl.log"
 
 bool RestartGlLog();
 

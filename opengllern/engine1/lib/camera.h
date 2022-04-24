@@ -7,9 +7,9 @@ namespace Engine1 {
 
 class Camera {
    public:
-      void LookAt(Eigen::Vector3f look_at);
-      void SetPosition(Eigen::Vector3f position);
-      void SetUpVector(Eigen::Vector3f up);
+      void LookAt(const Eigen::Vector3f &look_at);
+      void SetPosition(const Eigen::Vector3f &position);
+      void SetUpVector(const Eigen::Vector3f &up);
 
       void SetNearZ(float near_z);
       void SetFarZ(float far_z);

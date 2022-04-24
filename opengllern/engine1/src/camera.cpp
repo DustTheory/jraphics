@@ -1,20 +1,21 @@
 #include "../lib/camera.h"
 #include "../lib/mat_math.h"
+#include "../lib/quarternion_math.h"
 
 using Engine1::Camera;
 
-void Camera::LookAt(Eigen::Vector3f look_at){
+void Camera::LookAt(const Eigen::Vector3f &look_at){
     look_at_ = look_at;
     look_at_.normalize();
-    right_ = look_at_.cross(up_);
+    right_ = up_.cross(look_at_);
 }
-void Camera::SetPosition(Eigen::Vector3f position){
+void Camera::SetPosition(const Eigen::Vector3f &position){
     position_ = position;
 }
-void Camera::SetUpVector(Eigen::Vector3f up){
+void Camera::SetUpVector(const Eigen::Vector3f &up){
     up_ = up;
     up_.normalize();
-    right_ = look_at_.cross(up_);
+    right_ = up_.cross(look_at_);
 }
 
 void Camera::SetNearZ(float near_z){
@@ -28,17 +29,17 @@ void Camera::SetAspectRatio(float aspect_ratio){
 }
 
 void Camera::Rotate(float x, float y, float z){
-    look_at_.x() += x;
-    look_at_.y() += y;
-    look_at_.z() += z;
-    look_at_.normalize();
 
-    up_.x() += x;
-    up_.y() += y;
-    up_.z() += z;
-    up_.normalize();
+    auto rotate_vertical_quarternion = Engine1::GenRotationQuarternion(z, right_);
+    look_at_ = rotate_vertical_quarternion*look_at_;
+    up_ = rotate_vertical_quarternion*up_;
+    right_ = up_.cross(look_at_);
+    
+    auto rotate_horizintal_quarternion = Engine1::GenRotationQuarternion(-y, {0.0f, 1.0f, 0.0f});
+    look_at_ = rotate_horizintal_quarternion*look_at_;
+    up_ = rotate_horizintal_quarternion*up_;
+    right_ = up_.cross(look_at_);
 
-    right_ = look_at_.cross(up_);
 }
 void Camera::Move(float x, float y, float z){
     position_.x() += x;
@@ -47,9 +48,10 @@ void Camera::Move(float x, float y, float z){
 }
 
 void Camera::MoveRelativeToLook(float x, float y, float z){
-    position_ += look_at_*z;
-    position_ += up_*y;
-    position_ += right_ * x;
+
+    position_ += Eigen::Vector3f(look_at_.x(), -look_at_.y(), look_at_.z()).normalized()*z;
+    position_ += Eigen::Vector3f(0.0f, 1.0f, 0.0f)*y;
+    position_ += Eigen::Vector3f(right_.x(), 0.0f, right_.z()).normalized() * x;
 }
 
 Eigen::Matrix4f Camera::GetViewTransformMatrix(){

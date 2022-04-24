@@ -13,23 +13,25 @@
 #include "../lib/load_shader_file.h"
 #include "../lib/mat_math.h"
 #include "../lib/open_gl_window.h"
+#include "../lib/texture.h"
+#include "../lib/technique.h"
 
 #include "../lib/player.h"
 #include "../lib/player_controls.h"
 
 
-using namespace Engine1;
+using namespace engine1;
 
-void initLogging(){
+void InitLogging(){
     assert(RestartGlLog());
     RestartGlLog();
     GlLog("starting GLFW\n%s\n", glfwGetVersionString());
     glfwSetErrorCallback(GlfwErrorCallback);
 }
 
-void initGlfw(){
+void InitGlfw(){
     // Start GLFW3
-    if(!glfwInit()) {
+    if(glfwInit() == 0) {
         fprintf(stderr, "ERROR: could not start GLFW3\n");
         exit(1);
     }
@@ -41,17 +43,18 @@ void initGlfw(){
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);   
 }
 
-void initGlew(){
+void InitGlew(){
     glewExperimental = GL_TRUE;
     glewInit();
 }
 
 int main()
 {
-    initLogging();
-    initGlfw();
-    OpenGlWindow openGlWindow;    
-    initGlew();
+    InitLogging();
+    InitGlfw();
+    OpenGlWindow open_gl_window; 
+    open_gl_window.SetCursorMode(GLFW_CURSOR_DISABLED);
+    InitGlew();
 
     // Create Vertex Array Object
     GLuint vao;
@@ -63,38 +66,19 @@ int main()
     glGenBuffers(1, &vertex_vbo);
 
     GLfloat vertices[] = {
-       0.0f, 0.0f, 0.0f,
-       0.0f, 0.0f, 1.0f,
-       0.0f, 1.0f, 0.0f,
-       0.0f, 1.0f, 1.0f,
-       1.0f, 0.0f, 0.0f,
-       1.0f, 0.0f, 1.0f,
-       1.0f, 1.0f, 0.0f,
-       1.0f, 1.0f, 1.0f
+       -0.5F, -0.5F, -0.5F, 0.0F, 0.0F,
+       -0.5F, -0.5F, 0.5F, 0.0F, 0.0F,
+       -0.5F, 0.5F, -0.5F, 0.0F, 1.0F,
+       -0.5F, 0.5F, 0.5F, 0.0F, 1.0F,
+       0.5F, -0.5F, -0.5F, 1.0F, 0.0F,
+       0.5F, -0.5F, 0.5F, 1.0F, 0.0F,
+       0.5F, 0.5F, -0.5F, 1.0F, 1.0F,
+       0.5F, 0.5F, 0.5F, 1.0F, 1.0F,
     };
-
-    for(int i = 0; i < sizeof(vertices)/sizeof(GLfloat); i++)
-        vertices[i] -= 0.5;
 
     glBindBuffer(GL_ARRAY_BUFFER, vertex_vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    GLuint colors_vbo;
-    glGenBuffers(1, &colors_vbo);
-
-    float colors[] = {
-        1.0f, 0.0f,  0.0f,
-        0.0f, 1.0f,  0.0f,
-        0.0f, 0.0f,  1.0f,
-        1.0f, 0.0f,  0.0f,
-        0.0f, 1.0f,  0.0f,
-        0.0f, 0.0f,  1.0f,
-        1.0f, 0.0f,  0.0f,
-        0.0f, 1.0f,  0.0f
-    };
-
-    glBindBuffer(GL_ARRAY_BUFFER, colors_vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW);
 
     // Create an element array
     GLuint ebo;
@@ -123,97 +107,82 @@ int main()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
 
-    std::string vertexShaderStr = loadShaderFile("./src/shaders/vertexshader.vert");
-    const char *vertexShaderSrc = vertexShaderStr.c_str();
+    Technique1 test;
+    test.Init();
 
-    std::string fragmentShaderStr = loadShaderFile("./src/shaders/fragmentshader.frag");
-    const char * fragmentShaderSrc = fragmentShaderStr.c_str();
-
-    // Create and compile the vertex shader
-    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexShaderSrc, NULL);
-    glCompileShader(vertexShader);
-
-    // Create and compile the fragment shader
-    GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSrc, NULL);
-    glCompileShader(fragmentShader);
-
-
-    // Link the vertex and fragment shader into a shader program
-    GLuint shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glBindFragDataLocation(shaderProgram, 0, "frag_color");
-
-    glLinkProgram(shaderProgram);
-    GLint uniModel = glGetUniformLocation(shaderProgram, "model");
-    GLint uniProj = glGetUniformLocation(shaderProgram, "proj");
-    GLint uniView = glGetUniformLocation(shaderProgram, "view");
-
-
-    glUseProgram(shaderProgram);
-
-    glBindBuffer(GL_ARRAY_BUFFER, colors_vbo);
-    GLint colAttrib = glGetAttribLocation(shaderProgram, "vertex_color");
-    glEnableVertexAttribArray(colAttrib);
-    glVertexAttribPointer(colAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    test.Enable();
 
     glBindBuffer(GL_ARRAY_BUFFER, vertex_vbo);
-    GLint posAttrib = glGetAttribLocation(shaderProgram, "vertex_position");
-    glEnableVertexAttribArray(posAttrib);
-    glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    GLint pos_attrib = glGetAttribLocation(test.shader_program_, "vertex_position");
+    GLint texture_coords_attrib = glGetAttribLocation(test.shader_program_, "vertex_texture_coordinates");
 
+    Texture* texture = new Texture(GL_TEXTURE_2D, "./assets/textures/bricks.jpg");
+    if(!texture->Load()) {
+        return 1;
+}
 
     auto t_start = std::chrono::high_resolution_clock::now();
 
     glEnable(GL_CULL_FACE); 
     glCullFace(GL_BACK); 
-    glFrontFace(GL_CW);
+    glFrontFace(GL_CCW);
 
     Player player;
         player.player_camera_.SetAspectRatio(
-        static_cast<float>(openGlWindow.GetWidth())/
-        static_cast<float>(openGlWindow.GetHeight())
+        static_cast<float>(open_gl_window.GetWidth())/
+        static_cast<float>(open_gl_window.GetHeight())
     );
-    openGlWindow.GetInputRouter().AddHandler(std::make_shared<PlayerController>(player));
-        
-    while(!glfwWindowShouldClose(openGlWindow.GetWindow())) {
+    open_gl_window.GetInputRouter().AddHandler(std::make_shared<PlayerController>(player));
+    glEnable(GL_DEPTH_TEST);  
+    
+    Eigen::Matrix4f model = Eigen::Matrix4f::Identity();
+    
+    while(glfwWindowShouldClose(open_gl_window.GetWindow()) == 0) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glUseProgram(shaderProgram);
+        test.Enable();
 
         auto t_now = std::chrono::high_resolution_clock::now();
         float time = std::chrono::duration_cast<std::chrono::duration<float>>(t_now - t_start).count();
 
-        Eigen::Matrix4f model = Eigen::Matrix4f::Identity();
-        model *= GenTranslateMatrix(0, 0, 2);
-        model *= GenRotateAroundAxisMatrix(time, {0.0f, 1.0f, 0.0f});
+        test.setModelMatrix(model);
+        test.setViewMatrix(player.player_camera_.GetViewTransformMatrix());
+        test.setProjectionMatrix(player.player_camera_.GetProjectionTransformMatrix());
 
-        glUniformMatrix4fv(uniModel, 1, GL_FALSE,  model.data());
-        glUniformMatrix4fv(uniView, 1, GL_FALSE, player.player_camera_.GetViewTransformMatrix().data());
-        glUniformMatrix4fv(uniProj, 1, GL_FALSE, player.player_camera_.GetProjectionTransformMatrix().data());
+        glBindBuffer(GL_ARRAY_BUFFER, vertex_vbo);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+
+        texture->Bind(GL_TEXTURE0);
+        glUniform1i(test.g_sampler_location_, 0);
+
+        glEnableVertexAttribArray(pos_attrib);
+        glVertexAttribPointer(pos_attrib, 3, GL_FLOAT, GL_FALSE, 5*sizeof(float), 0);
+        
+        glEnableVertexAttribArray(texture_coords_attrib);
+        glVertexAttribPointer(texture_coords_attrib, 2, GL_FLOAT, GL_FALSE, 5*sizeof(float), reinterpret_cast<void*>(3 * sizeof(float)));
 
 
         glDrawElements(GL_TRIANGLES, sizeof(elements)/sizeof(unsigned int), GL_UNSIGNED_INT, 0);
         glfwPollEvents();
-        openGlWindow.GetInputRouter().RoutePoll();
-        glfwSwapBuffers(openGlWindow.GetWindow());
-        if(glfwGetKey(openGlWindow.GetWindow(), GLFW_KEY_ESCAPE)) {
-            glfwSetWindowShouldClose(openGlWindow.GetWindow(), 1);
+        open_gl_window.GetInputRouter().RoutePoll();
+        glfwSwapBuffers(open_gl_window.GetWindow());
+
+        glDisableVertexAttribArray(pos_attrib);
+        glDisableVertexAttribArray(texture_coords_attrib);
+
+        if(glfwGetKey(open_gl_window.GetWindow(), GLFW_KEY_ESCAPE) != 0) {
+            glfwSetWindowShouldClose(open_gl_window.GetWindow(), 1);
         }
 
     }
 
     glfwTerminate();
-    glDeleteProgram(shaderProgram);
-    glDeleteShader(fragmentShader);
-    glDeleteShader(vertexShader);
+
 
     glDeleteBuffers(1, &ebo);
     glDeleteBuffers(1, &vertex_vbo);
-    glDeleteBuffers(1, &colors_vbo);
 
     glDeleteVertexArrays(1, &vao);    
+    delete texture;
 
     return 0;
 }

@@ -16,7 +16,7 @@ class InputHandler;
 
 class InputHandler {
 public:
-  InputHandler(){}
+	InputHandler() = default;
   virtual void Handle() = 0;
   void SetRouter(Engine1::InputRouter* input_router);
 
@@ -30,6 +30,7 @@ protected:
   int GetKeyState(int key);
   int GetMouseButtonState(int button);
   void GetCursorPosition(double& pos_x, double& pos_y);
+  void GetCursorBounds(int& pos_x, int& pos_y);
 
   friend class Engine1::InputRouter;
 };
@@ -52,6 +53,7 @@ private:
   int GetKeyState(int key);
   int GetMouseButtonState(int button);
   void GetCursorPosition(double& pos_x, double& pos_y);
+  void GetCursorBounds(int& pos_x, int& pos_y);
 
   friend class Engine1::InputHandler;
 

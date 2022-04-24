@@ -1,7 +1,7 @@
 #include "../lib/mat_math.h"
 
-#define degreesToRadians(angleDegrees) (angleDegrees * M_PI / 180.0f)
-#define radiansToDegrees(angleRadians) (angleRadians * 180.0f / M_PI)
+#define degreesToRadians(angleDegrees) ((angleDegrees) * M_PI / 180.0f)
+#define radiansToDegrees(angleRadians) ((angleRadians) * 180.0f / M_PI)
 
 Eigen::Matrix4f Engine1::GenRotateAroundAxisMatrix(float radians, Eigen::Vector3f axis) {
     Eigen::Matrix4f C;

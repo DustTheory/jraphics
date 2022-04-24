@@ -5,7 +5,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "../lib/loggl.h";
+#include "../lib/loggl.h"
 
 bool RestartGlLog() {
   FILE* file = fopen(GL_LOG_FILE, "w");
@@ -107,7 +107,7 @@ void LogGlParams() {
   GlLog("%s %i %i\n", names[10], v[0], v[1]);
   unsigned char s = 0;
   glGetBooleanv(params[11], &s);
-  GlLog("%s %u\n", names[11], (unsigned int)s);
+  GlLog("%s %u\n", names[11], static_cast<unsigned int>(s));
   GlLog("-----------------------------\n");
 }
 
@@ -175,7 +175,7 @@ void PrintAll(GLuint programme) {
     );
     if (size > 1) {
       for(int j = 0; j < size; j++) {
-        char long_name[64];
+        char long_name[80];
         sprintf(long_name, "%s[%i]", name, j);
         int location = glGetAttribLocation(programme, long_name);
         printf("  %i) type:%s name:%s location:%i\n",
@@ -207,7 +207,7 @@ void PrintAll(GLuint programme) {
     );
     if(size > 1) {
       for(int j = 0; j < size; j++) {
-        char long_name[64];
+        char long_name[80];
         sprintf(long_name, "%s[%i]", name, j);
         int location = glGetUniformLocation(programme, long_name);
         printf("  %i) type:%s name:%s location:%i\n",

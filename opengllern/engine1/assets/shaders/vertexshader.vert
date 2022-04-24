@@ -1,15 +1,15 @@
 #version 150
 
 in vec3 vertex_position;
-in vec3 vertex_color;
+in vec2 vertex_texture_coordinates;
 
-out vec3 color;
+out vec2 texture_coordinates;
 
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 proj;
 
 void main() {
-  color = vertex_color;
+  texture_coordinates = vertex_texture_coordinates;
   gl_Position = proj * view * model * vec4(vertex_position, 1.0f);
 }

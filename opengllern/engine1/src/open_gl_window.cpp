@@ -5,8 +5,9 @@ using Engine1::InputRouter;
 
 OpenGlWindow::OpenGlWindow(){
     monitor_ = glfwGetPrimaryMonitor();
-    if(!monitor_)
+    if(!monitor_) {
         throw "Monitor not detected";
+}
     
     mode_ = glfwGetVideoMode(monitor_);
     width_ = mode_->width;
@@ -55,10 +56,15 @@ void OpenGlWindow::CreateWindow(){
                                 fullscreen_ ? monitor_ : NULL,
                                 nullptr);
 
-    if(window_ == NULL)
+    if(window_ == NULL) {
         throw "Failed to create window";
+}
     
     glfwMakeContextCurrent(window_);
+}
+
+void OpenGlWindow::SetCursorMode(int cursor_mode){
+    glfwSetInputMode(window_, GLFW_CURSOR, cursor_mode);
 }
 
 OpenGlWindow::~OpenGlWindow(){

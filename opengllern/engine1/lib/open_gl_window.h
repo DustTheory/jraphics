@@ -29,6 +29,7 @@ public:
 
     void SetFullScreen( bool fullscreen );
     void SetMultisamplingLevel(int multisampling_level);
+    void SetCursorMode(int cursor_mode);
 
     InputRouter& GetInputRouter(){
         return input_router_;

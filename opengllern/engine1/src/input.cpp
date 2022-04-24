@@ -8,14 +8,16 @@ InputRouter::InputRouter(GLFWwindow* window){
 }
 
 void InputRouter::SetWindow(GLFWwindow *window){
-      if(!window)
+      if(!window) {
             throw "Window mustn't be NULL";
+}
       window_ = window;
 }
 
 void InputRouter::RoutePoll(){
-     for(auto& handler : handlers_)
+     for(auto& handler : handlers_) {
             handler->Handle();
+}
 }
 
 
@@ -34,6 +36,10 @@ int InputRouter::GetMouseButtonState(int button){
 
 void InputRouter::GetCursorPosition(double& pos_x, double& pos_y){
       return glfwGetCursorPos(window_, &pos_x, &pos_y);
+}
+
+void InputRouter::GetCursorBounds(int& x_bound, int& y_bound){
+      glfwGetWindowSize(window_, &x_bound, &y_bound);
 }
 
 InputRouter* InputHandler::GetRouter(){
@@ -55,4 +61,8 @@ int InputHandler::GetMouseButtonState(int button){
 
 void InputHandler::GetCursorPosition(double& pos_x, double& pos_y){
       return GetRouter()->GetCursorPosition(pos_x, pos_y);
+}
+
+void InputHandler::GetCursorBounds(int& x_bound, int& y_bound){
+      return GetRouter()->GetCursorBounds(x_bound, y_bound);
 }
