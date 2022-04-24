@@ -2,7 +2,7 @@
 #include "../lib/mat_math.h"
 #include "../lib/quarternion_math.h"
 
-using Engine1::Camera;
+using engine1::Camera;
 
 void Camera::LookAt(const Eigen::Vector3f &look_at){
     look_at_ = look_at;
@@ -30,12 +30,12 @@ void Camera::SetAspectRatio(float aspect_ratio){
 
 void Camera::Rotate(float x, float y, float z){
 
-    auto rotate_vertical_quarternion = Engine1::GenRotationQuarternion(z, right_);
+    auto rotate_vertical_quarternion = engine1::GenRotationQuarternion(z, right_);
     look_at_ = rotate_vertical_quarternion*look_at_;
     up_ = rotate_vertical_quarternion*up_;
     right_ = up_.cross(look_at_);
     
-    auto rotate_horizintal_quarternion = Engine1::GenRotationQuarternion(-y, {0.0f, 1.0f, 0.0f});
+    auto rotate_horizintal_quarternion = engine1::GenRotationQuarternion(-y, {0.0F, 1.0F, 0.0F});
     look_at_ = rotate_horizintal_quarternion*look_at_;
     up_ = rotate_horizintal_quarternion*up_;
     right_ = up_.cross(look_at_);
@@ -50,14 +50,14 @@ void Camera::Move(float x, float y, float z){
 void Camera::MoveRelativeToLook(float x, float y, float z){
 
     position_ += Eigen::Vector3f(look_at_.x(), -look_at_.y(), look_at_.z()).normalized()*z;
-    position_ += Eigen::Vector3f(0.0f, 1.0f, 0.0f)*y;
-    position_ += Eigen::Vector3f(right_.x(), 0.0f, right_.z()).normalized() * x;
+    position_ += Eigen::Vector3f(0.0F, 1.0F, 0.0F)*y;
+    position_ += Eigen::Vector3f(right_.x(), 0.0F, right_.z()).normalized() * x;
 }
 
 Eigen::Matrix4f Camera::GetViewTransformMatrix(){
     return GenViewMatrix(position_, look_at_, up_);
 }
-Eigen::Matrix4f Camera::GetProjectionTransformMatrix(){
+Eigen::Matrix4f Camera::GetProjectionTransformMatrix() const{
     return GenProjectionMatrix(fov_, aspect_ratio_, near_z_, far_z_);
 }
 Eigen::Matrix4f Camera::GetProjectionViewTransformMatrix(){

@@ -1,11 +1,11 @@
-#ifndef ENGINE1_LIB_LOAD_SHADER_FILE_H_
-#define ENGINE1_LIB_LOAD_SHADER_FILE_H_
+#ifndef ENGIN_E1_LIB_LOAD_SHADER_FILE_H_
+#define ENGIN_E1_LIB_LOAD_SHADER_FILE_H_
 
 #include <GL/glew.h>
 #include <string>
 
-namespace Engine1 {
-    std::string loadShaderFile(const char *filePath);
+namespace engine1 {
+    std::string LoadShaderFile(const char *file_path);
 }
 
-#endif  // ENGINE1_LIB_LOAD_SHADER_FILE_H_
+#endif  // ENGIN_E1_LIB_LOAD_SHADER_FILE_H_

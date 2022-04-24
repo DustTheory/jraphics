@@ -14,21 +14,21 @@
 #include <vector>
 #include <algorithm>
 
-std::string Engine1::loadShaderFile(const char *filePath) {
+std::string engine1::LoadShaderFile(const char *file_path) {
     std::string content;
-    std::ifstream fileStream(filePath, std::ios::in);
+    std::ifstream file_stream(file_path, std::ios::in);
 
-    if(!fileStream.is_open()) {
-        std::cerr << "Could not read file " << filePath << ". File does not exist." << std::endl;
+    if(!file_stream.is_open()) {
+        std::cerr << "Could not read file " << file_path << ". File does not exist." << std::endl;
         return "";
     }
 
-    std::string line = "";
-    while(!fileStream.eof()) {
-        std::getline(fileStream, line);
+    std::string line;
+    while(!file_stream.eof()) {
+        std::getline(file_stream, line);
         content.append(line + "\n");
     }
 
-    fileStream.close();
+    file_stream.close();
     return content;
 }

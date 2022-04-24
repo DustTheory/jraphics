@@ -1,11 +1,11 @@
-#ifndef ENGINE1_LIB_PLAYER_H_
-#define ENGINE1_LIB_PLAYER_H_
+#ifndef ENGIN_E1_LIB_PLAYER_H_
+#define ENGIN_E1_LIB_PLAYER_H_
 
 #include "./camera.h"
 
 class Player {
  public:
-  Engine1::Camera player_camera_;
+  engine1::Camera player_camera;
 };
 
-#endif  // ENGINE1_LIB_PLAYER_H_
+#endif  // ENGIN_E1_LIB_PLAYER_H_

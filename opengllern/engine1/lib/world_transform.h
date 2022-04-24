@@ -1,9 +1,9 @@
-#ifndef ENGINE1_LIB_WORLD_TRANSFORM_H_
-#define ENGINE1_LIB_WORLD_TRANSFORM_H_
+#ifndef ENGIN_E1_LIB_WORLD_TRANSFORM_H_
+#define ENGIN_E1_LIB_WORLD_TRANSFORM_H
 
 #include <eigen3/Eigen/Dense>
 
-namespace Engine1 {
+namespace engine1 {
 
 class WorldTransform {
  public:
@@ -28,4 +28,4 @@ class WorldTransform {
 
 } // namespace Engine1
 
-#endif  // ENGINE1_LIB_WORLD_TRANSFORM_H_
+#endif  // ENGIN_E1_LIB_WORLD_TRANSFORM_H_

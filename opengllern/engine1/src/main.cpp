@@ -113,8 +113,8 @@ int main()
     test.Enable();
 
     glBindBuffer(GL_ARRAY_BUFFER, vertex_vbo);
-    GLint pos_attrib = glGetAttribLocation(test.shader_program_, "vertex_position");
-    GLint texture_coords_attrib = glGetAttribLocation(test.shader_program_, "vertex_texture_coordinates");
+    GLint pos_attrib = glGetAttribLocation(test.shader_program, "vertex_position");
+    GLint texture_coords_attrib = glGetAttribLocation(test.shader_program, "vertex_texture_coordinates");
 
     Texture* texture = new Texture(GL_TEXTURE_2D, "./assets/textures/bricks.jpg");
     if(!texture->Load()) {
@@ -128,7 +128,7 @@ int main()
     glFrontFace(GL_CCW);
 
     Player player;
-        player.player_camera_.SetAspectRatio(
+        player.player_camera.SetAspectRatio(
         static_cast<float>(open_gl_window.GetWidth())/
         static_cast<float>(open_gl_window.GetHeight())
     );
@@ -144,15 +144,15 @@ int main()
         auto t_now = std::chrono::high_resolution_clock::now();
         float time = std::chrono::duration_cast<std::chrono::duration<float>>(t_now - t_start).count();
 
-        test.setModelMatrix(model);
-        test.setViewMatrix(player.player_camera_.GetViewTransformMatrix());
-        test.setProjectionMatrix(player.player_camera_.GetProjectionTransformMatrix());
+        test.SetModelMatrix(model);
+        test.SetViewMatrix(player.player_camera.GetViewTransformMatrix());
+        test.SetProjectionMatrix(player.player_camera.GetProjectionTransformMatrix());
 
         glBindBuffer(GL_ARRAY_BUFFER, vertex_vbo);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
         texture->Bind(GL_TEXTURE0);
-        glUniform1i(test.g_sampler_location_, 0);
+        glUniform1i(test.g_sampler_location, 0);
 
         glEnableVertexAttribArray(pos_attrib);
         glVertexAttribPointer(pos_attrib, 3, GL_FLOAT, GL_FALSE, 5*sizeof(float), 0);

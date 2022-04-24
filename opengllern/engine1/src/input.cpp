@@ -1,14 +1,14 @@
 #include "../lib/input.h"
 
-using Engine1::InputRouter;
-using Engine1::InputHandler;
+using engine1::InputRouter;
+using engine1::InputHandler;
 
 InputRouter::InputRouter(GLFWwindow* window){
       SetWindow(window);
 }
 
 void InputRouter::SetWindow(GLFWwindow *window){
-      if(!window) {
+      if(window == nullptr) {
             throw "Window mustn't be NULL";
 }
       window_ = window;
@@ -35,7 +35,7 @@ int InputRouter::GetMouseButtonState(int button){
 }
 
 void InputRouter::GetCursorPosition(double& pos_x, double& pos_y){
-      return glfwGetCursorPos(window_, &pos_x, &pos_y);
+      glfwGetCursorPos(window_, &pos_x, &pos_y);
 }
 
 void InputRouter::GetCursorBounds(int& x_bound, int& y_bound){
@@ -60,9 +60,9 @@ int InputHandler::GetMouseButtonState(int button){
 }
 
 void InputHandler::GetCursorPosition(double& pos_x, double& pos_y){
-      return GetRouter()->GetCursorPosition(pos_x, pos_y);
+      GetRouter()->GetCursorPosition(pos_x, pos_y);
 }
 
 void InputHandler::GetCursorBounds(int& x_bound, int& y_bound){
-      return GetRouter()->GetCursorBounds(x_bound, y_bound);
+      GetRouter()->GetCursorBounds(x_bound, y_bound);
 }

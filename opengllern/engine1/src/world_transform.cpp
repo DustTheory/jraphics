@@ -1,7 +1,7 @@
 #include "../lib/world_transform.h"
 #include "../lib/mat_math.h"
 
-using Engine1::WorldTransform;
+using engine1::WorldTransform;
 
 void WorldTransform::SetScale(float x, float y, float z) {
     scale_ = {x, y, z};

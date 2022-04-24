@@ -4,16 +4,18 @@
 
 #include <GLFW/glfw3.h>
 
-Engine1::Texture::Texture(GLenum texture_target, const std::string &filename){
+engine1::Texture::Texture(GLenum texture_target, const std::string &filename){
     texture_target_ = texture_target;
     texture_filename_ = filename;
 }
 
-bool Engine1::Texture::Load(){
+bool engine1::Texture::Load(){
     stbi_set_flip_vertically_on_load(1);
-    int width = 0, height = 0, bpp = 0;
+    int width = 0;
+    int height = 0;
+    int bpp = 0;
     unsigned char* image_data = stbi_load(texture_filename_.c_str(), &width, &height, &bpp, 0);
-    if(!image_data){
+    if(image_data == nullptr){
         GlLog("Failed to load texture from %s - %s", texture_filename_.c_str(), stbi_failure_reason());
         return false;
     }
@@ -31,7 +33,7 @@ bool Engine1::Texture::Load(){
     return true;
 }
 
-void Engine1::Texture::Bind(GLenum texture_unit) const {
+void engine1::Texture::Bind(GLenum texture_unit) const {
     glActiveTexture(texture_unit);
     glBindTexture(texture_target_, texture_object_);
 }

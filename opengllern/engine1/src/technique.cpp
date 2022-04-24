@@ -4,17 +4,17 @@
 #include <string>
 #include <fstream>
 
-using Engine1::Technique;
-using Engine1::Technique1;
+using engine1::Technique;
+using engine1::Technique1;
 
 #define INVALID_UNIFORM_LOCATION 0xffffffff
 
 bool ReadTextFile(const char *file_path, std::string &dest);
 
 bool Technique::Init(){
-    shader_program_ = glCreateProgram();
+    shader_program = glCreateProgram();
 
-    if (shader_program_ == 0) {
+    if (shader_program == 0) {
         GlLogErr("Error creating shader program\n");
         return false;
     }
@@ -46,14 +46,14 @@ bool Technique::AddShader(GLenum shader_type, const char* shader_source_filepath
     GLint shader_compile_success;
     glGetShaderiv(shader_obj, GL_COMPILE_STATUS, &shader_compile_success);
 
-    if(shader_compile_success == false){
+    if(!static_cast<bool>(shader_compile_success)){
         GLchar shader_information_log[1024];
         glGetShaderInfoLog(shader_obj, 1024, NULL, shader_information_log);
         GlLogErr("Failed to compile %s. Shader info log tail: \n %s\n\n");
         return false;
     }
 
-    glAttachShader(shader_program_, shader_obj);
+    glAttachShader(shader_program, shader_obj);
     return true;
 }
 
@@ -62,20 +62,20 @@ bool Technique::Finalize(){
     char log_buffer[1024];
 
     GLint shader_program_link_success;
-    glLinkProgram(shader_program_);
-    glGetProgramiv(shader_program_, GL_LINK_STATUS, &shader_program_link_success);
+    glLinkProgram(shader_program);
+    glGetProgramiv(shader_program, GL_LINK_STATUS, &shader_program_link_success);
 
-    if(!shader_program_link_success){
-        glGetProgramInfoLog(shader_program_, sizeof(log_buffer), NULL, log_buffer);
+    if(shader_program_link_success == 0){
+        glGetProgramInfoLog(shader_program, sizeof(log_buffer), NULL, log_buffer);
         GlLogErr("Failed to link shader program: \n %s\n\n", log_buffer);
         return false;
     }
 
     GLint shader_program_validation_success;
-    glValidateProgram(shader_program_);
-    glGetProgramiv(shader_program_, GL_VALIDATE_STATUS, &shader_program_validation_success);
-    if (!shader_program_validation_success) {
-        glGetProgramInfoLog(shader_program_, sizeof(log_buffer), NULL, log_buffer);
+    glValidateProgram(shader_program);
+    glGetProgramiv(shader_program, GL_VALIDATE_STATUS, &shader_program_validation_success);
+    if (shader_program_validation_success == 0) {
+        glGetProgramInfoLog(shader_program, sizeof(log_buffer), NULL, log_buffer);
         fprintf(stderr, "Shader program validation failed: \n %s\n\n", log_buffer);
     }
 
@@ -84,16 +84,16 @@ bool Technique::Finalize(){
 }
     shader_obj_list_.clear();
 
-    return shader_program_validation_success;
+    return shader_program_validation_success != 0;
 }
 
-void Technique::Enable(){
-    glUseProgram(shader_program_);
+void Technique::Enable() const{
+    glUseProgram(shader_program);
 }
 
-GLint Technique::GetUniformLocation(const char* uniform_name)
+GLint Technique::GetUniformLocation(const char* uniform_name) const
 {
-    GLuint location = glGetUniformLocation(shader_program_, uniform_name);
+    GLuint location = glGetUniformLocation(shader_program, uniform_name);
 
     if (location == 0xffffffff) {
         GlLogErr("Warning! Unable to get the location of uniform '%s'\n", uniform_name);
@@ -110,7 +110,7 @@ bool ReadTextFile(const char *file_path, std::string &dest){
         return false;
 }
 
-    std::string line = "";
+    std::string line;
     while(!file_stream.eof()) {
         std::getline(file_stream, line);
         dest.append(line + "\n");
@@ -141,12 +141,12 @@ bool Technique1::Init(){
     uni_view_location_ = GetUniformLocation("view");
     uni_proj_location_ = GetUniformLocation("proj");
     uni_model_location_ = GetUniformLocation("model");
-    g_sampler_location_ = GetUniformLocation("g_sampler");
+    g_sampler_location = GetUniformLocation("g_sampler");
 
     if( uni_model_location_ == INVALID_UNIFORM_LOCATION ||
         uni_proj_location_ == INVALID_UNIFORM_LOCATION ||
         uni_view_location_ == INVALID_UNIFORM_LOCATION ||
-        g_sampler_location_ == INVALID_UNIFORM_LOCATION
+        g_sampler_location == INVALID_UNIFORM_LOCATION
     ){
         GlLogErr("Invalid uniform location");
         return false;
@@ -155,18 +155,18 @@ bool Technique1::Init(){
     return true;
 }
 
-void Technique1::setModelMatrix(const Eigen::Matrix4f &modelMatrix){
-    glUniformMatrix4fv(uni_model_location_, 1, GL_FALSE,  modelMatrix.data());
+void Technique1::SetModelMatrix(const Eigen::Matrix4f &model_matrix) const{
+    glUniformMatrix4fv(uni_model_location_, 1, GL_FALSE,  model_matrix.data());
 }
 
-void Technique1::setViewMatrix(const Eigen::Matrix4f &viewMatrix){
-    glUniformMatrix4fv(uni_view_location_, 1, GL_FALSE,  viewMatrix.data());
+void Technique1::SetViewMatrix(const Eigen::Matrix4f &view_matrix) const{
+    glUniformMatrix4fv(uni_view_location_, 1, GL_FALSE,  view_matrix.data());
 }
 
-void Technique1::setProjectionMatrix(const Eigen::Matrix4f &projectionMatrix){
-    glUniformMatrix4fv(uni_proj_location_, 1, GL_FALSE,  projectionMatrix.data());
+void Technique1::SetProjectionMatrix(const Eigen::Matrix4f &projection_matrix) const{
+    glUniformMatrix4fv(uni_proj_location_, 1, GL_FALSE,  projection_matrix.data());
 }
 
 Technique1::~Technique1(){
-    glDeleteProgram(shader_program_);
+    glDeleteProgram(shader_program);
 }

@@ -1,10 +1,10 @@
-#ifndef ENGINE1_LIB_PLAYER_CONTROLS_H_
-#define ENGINE1_LIB_PLAYER_CONTROLS_H_
+#ifndef ENGIN_E1_LIB_PLAYER_CONTROLS_H
+#define ENGIN_E1_LIB_PLAYER_CONTROLS_H
 
 #include "./input.h"
 #include "./player.h"
 
-class PlayerController : public Engine1::InputHandler {
+class PlayerController : public engine1::InputHandler {
  public:
    virtual void Handle();
    explicit PlayerController(Player &player);
@@ -12,4 +12,4 @@ class PlayerController : public Engine1::InputHandler {
     Player& player_;
 };
 
-#endif  // ENGINE1_LIB_PLAYER_CONTROLS_H_
+#endif  // ENGIN_E1_LIB_PLAYER_CONTROLS_H_

@@ -9,7 +9,7 @@
 
 bool RestartGlLog() {
   FILE* file = fopen(GL_LOG_FILE, "w");
-  if(!file) {
+  if(file == nullptr) {
     fprintf(stderr,
       "ERROR: could not open GL_LOG_FILE log file %s for writing\n",
       GL_LOG_FILE);
@@ -25,7 +25,7 @@ bool RestartGlLog() {
 bool GlLog(const char* message, ...) {
   va_list argptr;
   FILE* file = fopen(GL_LOG_FILE, "a");
-  if(!file) {
+  if(file == nullptr) {
     fprintf(
       stderr,
       "ERROR: could not open GL_LOG_FILE %s file for appending\n",
@@ -43,7 +43,7 @@ bool GlLog(const char* message, ...) {
 bool GlLogErr(const char* message, ...) {
   va_list argptr;
   FILE* file = fopen(GL_LOG_FILE, "a");
-  if(!file) {
+  if(file == nullptr) {
     fprintf(stderr,
       "ERROR: could not open GL_LOG_FILE %s file for appending\n",
       GL_LOG_FILE);

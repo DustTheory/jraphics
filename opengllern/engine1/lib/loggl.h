@@ -1,7 +1,7 @@
 #include <GLFW/glfw3.h>
 
-#ifndef ENGINE1_LIB_LOGGL_H_
-#define ENGINE1_LIB_LOGGL_H_
+#ifndef ENGIN_E1_LIB_LOGGL_H_
+#define ENGIN_E1_LIB_LOGGL_H
 
 #define GL_LOG_FILE "gl.log"
 
@@ -22,4 +22,4 @@ const char* GlTypeToString(GLenum type);
 
 void PrintAll(GLuint programme);
 
-#endif  // ENGINE1_LIB_LOGGL_H_
+#endif  // ENGIN_E1_LIB_LOGGL_H_

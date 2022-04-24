@@ -1,11 +1,11 @@
 #include "../lib/open_gl_window.h"
 
-using Engine1::OpenGlWindow;
-using Engine1::InputRouter;
+using engine1::OpenGlWindow;
+using engine1::InputRouter;
 
 OpenGlWindow::OpenGlWindow(){
     monitor_ = glfwGetPrimaryMonitor();
-    if(!monitor_) {
+    if(monitor_ == nullptr) {
         throw "Monitor not detected";
 }
     

@@ -1,12 +1,12 @@
-#ifndef ENGINE1_LIB_TEXTURE_H_
-#define ENGINE1_LIB_TEXTURE_H_
+#ifndef ENGIN_E1_LIB_TEXTURE_H_
+#define ENGIN_E1_LIB_TEXTURE_H
 
 #include <GLFW/glfw3.h>
 #include <string>
 
 #include "../lib/loggl.h"
 
-namespace Engine1 {
+namespace engine1 {
 
 class Texture {
     public:
@@ -21,4 +21,4 @@ class Texture {
 
 } // namespace Engine1
 
-#endif  // ENGINE1_LIB_TEXTURE_H_
+#endif  // ENGIN_E1_LIB_TEXTURE_H_

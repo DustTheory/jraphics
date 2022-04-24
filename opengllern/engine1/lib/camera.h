@@ -1,15 +1,15 @@
-#ifndef ENGINE1_LIB_CAMERA_H_
-#define ENGINE1_LIB_CAMERA_H_
+#ifndef ENGIN_E1_LIB_CAMERA_H_
+#define ENGIN_E1_LIB_CAMERA_H_
 
 #include <eigen3/Eigen/Dense>
 
-namespace Engine1 {
+namespace engine1 {
 
 class Camera {
    public:
       void LookAt(const Eigen::Vector3f &look_at);
       void SetPosition(const Eigen::Vector3f &position);
-      void SetUpVector(const Eigen::Vector3f &up);
+      void SetUpVector(const Eigen::Vector3f &up_vector);
 
       void SetNearZ(float near_z);
       void SetFarZ(float far_z);
@@ -20,22 +20,22 @@ class Camera {
       void MoveRelativeToLook(float x, float y, float z);
 
       Eigen::Matrix4f GetViewTransformMatrix();
-      Eigen::Matrix4f GetProjectionTransformMatrix();
+      Eigen::Matrix4f GetProjectionTransformMatrix() const;
       Eigen::Matrix4f GetProjectionViewTransformMatrix();
 
    private:
-      Eigen::Vector3f position_ = {0.0f, 0.0f, 0.0f};
-      Eigen::Vector3f look_at_ = {0.0f, 0.0f, 1.0f};
-      Eigen::Vector3f up_ = {0.0f, 1.0f, 0.0f};
-      Eigen::Vector3f right_ = {1.0f, 0.0f, 0.0f};
+      Eigen::Vector3f position_ = {0.0F, 0.0F, 0.0F};
+      Eigen::Vector3f look_at_ = {0.0F, 0.0F, 1.0F};
+      Eigen::Vector3f up_ = {0.0F, 1.0F, 0.0F};
+      Eigen::Vector3f right_ = {1.0F, 0.0F, 0.0F};
 
-      float fov_ = 90.0f;
-      float near_z_ = 1.0f;
-      float far_z_ = 10.0f;
+      float fov_ = 90.0F;
+      float near_z_ = 1.0F;
+      float far_z_ = 10.0F;
       float aspect_ratio_ = 1.0;
 
    };
 
 } // namespace Engine1
 
-#endif  // ENGINE1_LIB_CAMERA_H_
+#endif  // ENGIN_E1_LIB_CAMERA_H_

@@ -5,12 +5,12 @@
 #include <string>
 #include <vector>
 
-#ifndef ENGINE1_LIB_OPEN_GL_WINDOW_H_
-#define ENGINE1_LIB_OPEN_GL_WINDOW_H_
+#ifndef ENGIN_E1_LIB_OPEN_GL_WINDOW_H_
+#define ENGIN_E1_LIB_OPEN_GL_WINDOW_H
 
-using Engine1::InputRouter;
+using engine1::InputRouter;
 
-namespace Engine1 {
+namespace engine1 {
 
 class OpenGlWindow {
 public:
@@ -53,11 +53,11 @@ private:
 
     InputRouter input_router_;
 
-    static void CallbackResize(GLFWwindow* window, int cx, int cy);
+    static void CallbackResize(GLFWwindow* window, int width, int height);
     void CreateWindow();
 };
 
-} // namespace Engine1
+} // namespace engine1
 
-#endif  // ENGINE1_LIB_OPEN_GL_WINDOW_H_
+#endif  // ENGIN_E1_LIB_OPEN_GL_WINDOW_H_
 
